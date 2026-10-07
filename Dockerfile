@@ -24,6 +24,8 @@ RUN composer dump-autoload --no-dev --optimize --no-interaction \
 COPY --from=frontend /app/dist/index.html ./public/index.html
 COPY --from=frontend /app/dist/assets ./public/assets
 COPY deploy/apache.conf /etc/apache2/sites-available/000-default.conf
+COPY deploy/apache-mpm.conf /etc/apache2/conf-available/dispatch-mpm.conf
+RUN a2enconf dispatch-mpm
 COPY deploy/php.ini /usr/local/etc/php/conf.d/dispatch.ini
 COPY deploy/start.sh /usr/local/bin/dispatch-start
 RUN chmod +x /usr/local/bin/dispatch-start

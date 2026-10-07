@@ -97,3 +97,9 @@ Checks: PHP formatting, frontend lint, production build, and aggregate address c
 Implemented bottom navigation and an accessible mobile drawer, card lists below 768px, collapsible order/ride filters, larger touch controls, responsive forms and pagination, full-screen dialogs with visual viewport handling, safe-area spacing, larger route pins, and explicit map pan/page-scroll controls. Address suggestions select on click rather than touch-down, allowing touch scrolling before selection. Page routes are lazy loaded.
 
 Frontend lint and production build passed. Test suites, browser workflows, and device visual checks were not run, consistent with the user's earlier request to skip tests. Mobile layout behavior still needs real-device review.
+
+## Render / Neon deployment preparation
+
+Added a multi-stage PHP 8.4 Apache / Node 22 Docker build, same-origin frontend serving, SPA history fallback, trusted proxy handling, secure cookie settings, PostgreSQL-compatible constraint rollback, environment-based production administrator bootstrap, and a Render Free Blueprint for external Neon PostgreSQL. Local secrets and databases are excluded from Git and Docker. Apache worker concurrency is limited for the free instance.
+
+Checks: frontend lint/build, PHP formatting, shell syntax, Laravel route cache generation, Docker image build, and image content/extension inspection. No feature or browser test suites were run. Public hosting verification remains pending account/API access.
