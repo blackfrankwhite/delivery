@@ -11,6 +11,18 @@ const props = defineProps({
   plan: Object,
 });
 const emit = defineEmits(['select']);
+const orderStatuses = {
+  pending: { label: 'pending', color: '#475569' },
+  assigned: { label: 'assigned', color: '#1d4ed8' },
+  started: { label: 'In progress', color: '#b45309' },
+  arrived: { label: 'arrived', color: '#7c3aed' },
+  delivered: { label: 'delivered', color: '#047857' },
+  failed: { label: 'failed', color: '#b91c1c' },
+  cancelled: { label: 'cancelled', color: '#64748b' },
+};
+function orderStatus(task) {
+  return orderStatuses[task.status] || orderStatuses.pending;
+}
 const container = ref(null),
   tileError = ref(false);
 let map, layers, tiles, observer, boundsKey;
@@ -59,16 +71,16 @@ function draw() {
     const point = coordinates(task);
     if (!point) return;
     const marker = L.marker(point, {
-      title: `${t('Stop {number}', { number: index + 1 })} · ${task.recipient_name}`,
+      title: `${t('Stop {number}', { number: index + 1 })} · ${task.recipient_name} · ${t(orderStatus(task).label)}`,
       icon: L.divIcon({
         className: 'ride-map-pin',
-        html: `<span>${index + 1}</span>`,
+        html: `<span style="background-color: ${orderStatus(task).color}">${index + 1}</span>`,
         iconSize: [44, 44],
         iconAnchor: [22, 22],
       }),
     }).addTo(layers);
     const label = document.createElement('span');
-    label.textContent = `${task.reference_number} · ${task.recipient_name}`;
+    label.textContent = `${task.reference_number} · ${task.recipient_name} · ${t(orderStatus(task).label)}`;
     const samePlace = props.tasks.filter(
       (other) => JSON.stringify(coordinates(other)) === JSON.stringify(point),
     );
@@ -81,7 +93,7 @@ function draw() {
         const button = document.createElement('button');
         button.type = 'button';
         button.className = 'block py-2 text-left font-semibold text-brand-700';
-        button.textContent = `${props.tasks.indexOf(other) + 1}. ${other.reference_number} · ${other.recipient_name}`;
+        button.textContent = `${props.tasks.indexOf(other) + 1}. ${other.reference_number} · ${other.recipient_name} · ${t(orderStatus(other).label)}`;
         button.addEventListener('click', () => emit('select', other.id));
         popup.append(button);
       }
@@ -197,6 +209,20 @@ onUnmounted(() => {
         )
       }}
     </p>
+    <ul class="mt-3 flex flex-wrap gap-x-4 gap-y-2 text-xs text-slate-600">
+      <li
+        v-for="(status, key) in orderStatuses"
+        :key="key"
+        class="flex items-center gap-1.5 capitalize"
+      >
+        <span
+          class="h-3 w-3 shrink-0 rounded-full"
+          :style="{ backgroundColor: status.color }"
+          aria-hidden="true"
+        ></span>
+        {{ $t(status.label) }}
+      </li>
+    </ul>
     <p v-if="tileError" class="mt-3 text-xs text-amber-700" role="alert">
       {{
         $t(
